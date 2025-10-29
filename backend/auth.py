@@ -4,8 +4,8 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
 from jose import JWTError, jwt
+from security import get_password_hash, verify_password
 
 from database import SessionLocal
 import models, schemas
@@ -20,7 +20,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 1 day
 # -------------------------------------------------------------------
 # Password hashing and router setup
 # -------------------------------------------------------------------
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -35,16 +34,6 @@ def get_db():
     finally:
         db.close()
 
-# -------------------------------------------------------------------
-# Helper functions
-# -------------------------------------------------------------------
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a plaintext password against a hashed password."""
-    return pwd_context.verify(plain_password, hashed_password)
-
-def get_password_hash(password: str) -> str:
-    """Generate a hashed version of a password."""
-    return pwd_context.hash(password)
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """Create a JWT access token with expiration."""
@@ -62,14 +51,22 @@ def register(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(models.User).filter(models.User.username == user_in.username).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already registered")
-    
+
     hashed_password = get_password_hash(user_in.password)
     new_user = models.User(username=user_in.username, password=hashed_password)
-    
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
     return new_user
+
+@router.post("/login")
+def login(form_data: schemas.LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.username == form_data.username).first()
+    if not user or not verify_password(form_data.password, user.password):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    return {"message": "Login successful", "user": user.username}
 
 
 @router.post("/token")

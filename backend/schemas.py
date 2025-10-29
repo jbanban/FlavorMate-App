@@ -15,8 +15,12 @@ class Recipe(RecipeBase):
     owner_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+    
 class UserBase(BaseModel):
     username: str
 
@@ -28,4 +32,10 @@ class User(UserBase):
     recipes: List[Recipe] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+class UserOut(UserBase):
+    id: int
+
+    class Config:
+        from_attributes = True
