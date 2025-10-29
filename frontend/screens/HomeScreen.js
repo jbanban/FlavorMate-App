@@ -1,33 +1,56 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity } from "react-native";
-import api from "../api/api";
+
+import Layout from "../components/Layout";
+import EmptyState from "../components/EmptyState";
 import RecipeCard from "../components/RecipeCard";
+import axios from "axios";
 
 export default function HomeScreen({ navigation }) {
   const [recipes, setRecipes] = useState([]);
 
   useEffect(() => {
-    api.get("/recipes").then((res) => setRecipes(res.data));
+    axios
+      .get("http://127.0.0.1:8000/recipes")
+      .then((res) => setRecipes(res.data))
+      .catch((err) => console.error(err));
   }, []);
 
   return (
-    <View style={{ flex: 1, padding: 10 }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 10 }}>🍽️ Recipes</Text>
-      <FlatList
-        data={recipes}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => navigation.navigate("RecipeDetails", { recipe: item })}>
-            <RecipeCard recipe={item} />
-          </TouchableOpacity>
+    <Layout>
+      <View>
+        <Text style={{ fontSize: 24, fontWeight: "700" }}>
+          Welcome to FlavorMate
+        </Text>
+        <Text style={{ color: "#555", marginBottom: 20 }}>
+          Discover and share delicious recipes from our community.
+        </Text>
+
+        {recipes.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <FlatList
+            data={recipes}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={{ paddingBottom: 100 }}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("RecipeDetails", { recipe: item })
+                }
+              >
+                <RecipeCard recipe={item} />
+              </TouchableOpacity>
+            )}
+          />
         )}
-      />
-      <TouchableOpacity
-        style={{ backgroundColor: "#FF7043", padding: 15, borderRadius: 10, marginTop: 20 }}
-        onPress={() => navigation.navigate("AddRecipe")}
-      >
-        <Text style={{ textAlign: "center", color: "white" }}>Add New Recipe</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          style={{ backgroundColor: "#FF7043", padding: 15, borderRadius: 10, marginTop: 20 }}
+          onPress={() => navigation.navigate("AddRecipe")}
+          >
+            <Text style={{ textAlign: "center", color: "white" }}>Add New Recipe</Text>
+        </TouchableOpacity>
+      </View>
+    </Layout>
   );
 }

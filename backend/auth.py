@@ -103,3 +103,26 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise credentials_exception
 
     return user
+
+@router.get("/me", response_model=schemas.UserOut)
+def read_users_me(current_user: models.User = Depends(get_current_user)):
+    """Return the currently authenticated user's info."""
+    return current_user
+
+@router.patch("/{user_id}", response_model=schemas.UserOut)
+def update_user_profile(
+    user_id: int,
+    user_update: schemas.UserUpdate,
+    db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Update only the fields provided
+    for key, value in user_update.dict(exclude_unset=True).items():
+        setattr(user, key, value)
+
+    db.commit()
+    db.refresh(user)
+    return user

@@ -17,6 +17,13 @@ class Recipe(RecipeBase):
     class Config:
         from_attributes = True
 
+class RecipeOut(RecipeBase):
+    id: int
+    owner_id: int
+
+    class Config:
+        from_attributes = True
+
 class LoginRequest(BaseModel):
     username: str
     password: str
@@ -36,6 +43,14 @@ class User(UserBase):
 
 class UserOut(UserBase):
     id: int
+    username: str
+    email: Optional[str]
+    bio: Optional[str]
 
     class Config:
         from_attributes = True
+
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[str] = None
+    bio: Optional[str] = None

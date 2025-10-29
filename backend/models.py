@@ -6,8 +6,10 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    password = Column(String)
+    username = Column(String(50), unique=True, index=True)
+    email = Column(String(100), unique=True, index=True, nullable=True)
+    bio = Column(Text, nullable=True)
+    password = Column(String(200))
 
     recipes = relationship("Recipe", back_populates="owner")
 
