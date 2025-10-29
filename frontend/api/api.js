@@ -1,17 +1,9 @@
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const API_URL = "http://127.0.0.1:8000"; // replace with your FastAPI server IP
+import { BASE_URL } from "../constants/config";
 
 const api = axios.create({
-  baseURL: API_URL,
-});
-
-// Attach JWT token to every request
-api.interceptors.request.use(async (config) => {
-  const token = await AsyncStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
+  baseURL: BASE_URL,
+  headers: { "Content-Type": "application/json" },
 });
 
 export default api;
