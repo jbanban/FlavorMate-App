@@ -7,6 +7,7 @@ import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import HomeScreen from "./screens/HomeScreen";
 import AddRecipeScreen from "./screens/AddRecipeScreen";
+import RecipeDetails from "./screens/RecipeDetails";
 import ProfileScreen from "./screens/ProfileScreen";
 
 // Inside your Stack or Tab.Navigator
@@ -22,7 +23,8 @@ export default function App() {
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="AddRecipe" component={AddRecipeScreen} />
-        <Stack.Screen name="EditableProfile" component={ProfileScreen} />
+        <Stack.Screen name="RecipeDetails" component={RecipeDetails} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

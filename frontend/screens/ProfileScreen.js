@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Image,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 export default function ProfileScreen() {
   const [user, setUser] = useState({
@@ -9,15 +18,48 @@ export default function ProfileScreen() {
   });
 
   const [editing, setEditing] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
 
   const handleSave = () => {
     setEditing(false);
     Alert.alert("Profile Updated", "Your information has been saved!");
   };
 
+  const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert("Permission Required", "You need to allow access to your gallery.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>My Profile</Text>
+
+      {/* Profile Picture Section */}
+      <View style={styles.imageContainer}>
+        <TouchableOpacity onPress={pickImage}>
+          {profileImage ? (
+            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+          ) : (
+            <View style={styles.placeholder}>
+              <Text style={styles.placeholderText}>Upload Photo</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.section}>
         <Text style={styles.label}>Username</Text>
@@ -64,13 +106,40 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     padding: 20,
+    alignItems: "center",
   },
   title: {
     fontSize: 26,
     fontWeight: "700",
-    marginBottom: 20,
+    marginBottom: 10,
+  },
+  imageContainer: {
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: "#FF7043",
+  },
+  placeholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#f0f0f0",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  placeholderText: {
+    color: "#888",
+    fontWeight: "500",
   },
   section: {
+    width: "100%",
     marginBottom: 30,
   },
   label: {
@@ -99,12 +168,14 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
+    width: "100%",
   },
   saveButton: {
     backgroundColor: "#4CAF50",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
+    width: "100%",
   },
   buttonText: {
     color: "#fff",

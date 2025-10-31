@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity } from "react-native";
 
-import Layout from "../components/Layout";
-import EmptyState from "../components/EmptyState";
-import RecipeCard from "../components/RecipeCard";
+import Layout from "@/components/Layout";
+import EmptyState from "@/components/EmptyState";
 import axios from "axios";
+
+import { API_ENDPOINTS } from "@/constants/config";
 
 export default function HomeScreen({ navigation }) {
   const [recipes, setRecipes] = useState([]);
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/recipes")
-      .then((res) => setRecipes(res.data))
-      .catch((err) => console.error(err));
+      .get(API_ENDPOINTS.RECIPES)
+      .then((res) => {
+        console.log("Fetched recipes:", res.data);
+        setRecipes(res.data);
+      })
+      .catch((err) => console.error("Error fetching recipes:", err.message));
   }, []);
 
   return (
@@ -32,17 +36,21 @@ export default function HomeScreen({ navigation }) {
           <FlatList
             data={recipes}
             keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={{ paddingBottom: 100 }}
             renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() =>
                   navigation.navigate("RecipeDetails", { recipe: item })
                 }
+                style={{ padding: 12, border: 1, borderColor: "#ddd", borderRadius: 5 }}
               >
-                <RecipeCard recipe={item} />
+                <Text style={{ fontSize: 18, fontWeight: "600" }}>{item.title}</Text>
+                <Text numberOfLines={1} style={{ color: "#666" }}>
+                  {item.ingredients}
+                </Text>
               </TouchableOpacity>
             )}
           />
+
         )}
         <TouchableOpacity
           style={{ backgroundColor: "#FF7043", padding: 15, borderRadius: 10, marginTop: 20 }}

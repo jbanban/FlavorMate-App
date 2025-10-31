@@ -6,7 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 const routesFromSchemas = [
   { label: "Home", screen: "HomeScreen", icon: "home-outline" },
   { label: "Add Recipe", screen: "AddRecipe", icon: "add-outline" },
-  { label: "Profile", screen: "Profile", icon: "person-outline" },
+  { label: "Profile", screen: "ProfileScreen", icon: "person-outline" },
 ];
 
 export default function Navbar() {
@@ -36,7 +36,14 @@ export default function Navbar() {
           </TouchableOpacity>
         ))}
 
-        <TouchableOpacity onPress={() => console.log("Logout pressed")}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "Login" }],
+            });
+          }}
+        >
           <Ionicons name="log-out-outline" size={22} color="black" />
         </TouchableOpacity>
       </View>

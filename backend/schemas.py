@@ -54,3 +54,4 @@ class UserUpdate(BaseModel):
     username: Optional[str] = None
     email: Optional[str] = None
     bio: Optional[str] = None
+    image_url: Optional[str] = None
